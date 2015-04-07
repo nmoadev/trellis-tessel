@@ -1,6 +1,6 @@
 # trellis-tessel API
 ## Setup
-`trellis-tessel(port)`
+`Trellis.createInstance(port)`  
 Create a `trellis` object on the Tessel port passed in. Will throw an exception if a trellis object is already registered for that port.
 
 **Parameters**:
@@ -9,11 +9,8 @@ Create a `trellis` object on the Tessel port passed in. Will throw an exception 
 
 **Return**: a `trellis` object
 
-----
 
-`trellis.interrupts(enable, mode)`
-
-
+`trellis.interrupts(enable, mode)`  
 Enable/disable interrupts and set the mode.
 
 * One trellis object will use **at most one of the seven interrupts on the Tessel 1.**
@@ -28,7 +25,6 @@ Enable/disable interrupts and set the mode.
 * `enable` Boolean; disable/enable interrupts
 * `mode` String; `'level'` to use *Level Triggers *or `'edge'` to use *Edge Triggers*
 
----
 
 ## Accessors
 `trelllis.port()` get the Tessel port on which the Trellis module is connected.
@@ -41,11 +37,10 @@ Enable/disable interrupts and set the mode.
 `tnode.led` get the led at this node.
 
 ## TButton
+#### Polling vs Interrupts
+The trellis-tessel API supports both an interrupt-based and polling-based approach to getting user input from the push buttons.
 
-`button.enable(value)`
-
-
-### Button Event Handlers
+### Interrupt-Based Event Handlers
 These callbacks depend on the use of interrupts. See Setup for more details.
 
 `button.on('press', callback)`
@@ -72,9 +67,19 @@ Callback will be executed **at most once** when the button has stabilized at the
 Requires *Level Triggers* to be enabled.
 Callback will be executed **at most once** when the button has stabilized at the released state.
 
+### Polling Based Event Handlers
+
+`button.poll(interval, callback, value)`
+Does _not_ require interrupts to be enabled.
+Checks the value of the button every `interval` milliseconds, executing `callback` if `button.value() === value`
+
+### Button Accessors
+
 `button.value()`
 Get the current value of the button.
 
 ## TLed
-`led.output(value)`
-`led.toggle()`
+`led.output(value)` Set the state of the LED. If `value` is non-zero the LED will be turned on.
+`led.toggle()` Toggle the state of the LED.
+
+
