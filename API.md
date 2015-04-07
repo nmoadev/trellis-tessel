@@ -10,7 +10,7 @@ Create a `trellis` object on the Tessel port passed in. Will throw an exception 
 **Return**: a `trellis` object
 
 
-### `trellis.interrupts(enable, mode)`  
+#### `trellis.interrupts(enable, mode)`  
 Enable/disable interrupts and set the mode.
 
 * One trellis object will use **at most one of the seven interrupts on the Tessel 1.**
