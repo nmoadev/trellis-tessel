@@ -1,5 +1,5 @@
 var tessel = require('tessel'),     // This requires that tessel libraries be installed on developers machine
-    TNode = require('./tnode'),       // This 
+    TNode = require('./TNode.js'),       // This 
     Trellis;                        // The module function
 
 /**
@@ -11,6 +11,9 @@ Trellis = function Trellis(port, interrupt_enable, interrupt_mode) {
   
   // Setup default options
   _trellis.port = port;
+  // The device i2c address
+  _trellis.addr = 0x70;
+  _trellis.i2c = new port.I2C(_trellis.addr);
   _trellis.interrupts = {
     enable: true,
     mode: 'edge'
@@ -32,10 +35,17 @@ Trellis = function Trellis(port, interrupt_enable, interrupt_mode) {
   ];
  
   _trellis.buttonValue = function checkButton(buttonAddr) {
-    
+    console.trace("Check");
+    // Send read button data response
+//    _trellis.i2c.transfer(new Buffer([]), function (err, rx) {
+      // Get back some buffer and go through the results, we REALLY need something better than callbacks
+//    });
   };
 
   _trellis.outputLed = function outputLed(ledAdr, value) {
+    console.trace("Check");
+    console.log("Check");
+
   };
 
 
@@ -47,15 +57,16 @@ Trellis = function Trellis(port, interrupt_enable, interrupt_mode) {
   };
 
   trellis.led = function led(row, col) {
-    return _trellis.nodes[row, col].led;
+    return _trellis.nodes[row][ col].led;
   };
 
   trellis.button = function button(row, col) {
-    return _trellis.nodes[row, col].button;
+    return _trellis.nodes[row][col].button;
   };
 
   trellis.node = function node(row, col) {
-    return _trellis.nodes[row, col];
+    console.trace("In node");
+    return _trellis.nodes[row][col];
   };
 
   return trellis;

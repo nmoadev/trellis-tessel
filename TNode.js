@@ -8,6 +8,7 @@ TLed = function TLed(ledAddr, _trellis) {
   tled.output = function output(value) {
     _trellis.outputLed(ledAdr, value);
   }
+  return tled;
 };
 
 TButton = function TButton(buttonAddr, _trellis) {
@@ -62,6 +63,8 @@ TButton = function TButton(buttonAddr, _trellis) {
 
     }
   }
+
+  return tbutton;
 };
 
 TNode = function TNode(ledAddr, buttonAddr, _trellis) {
@@ -70,3 +73,5 @@ TNode = function TNode(ledAddr, buttonAddr, _trellis) {
   tnode.led = TLed(ledAddr, _trellis);
   return tnode;
 };
+
+module.exports = TNode;
