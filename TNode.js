@@ -1,4 +1,5 @@
-var EventEmitter = require('events').EventEmitterm
+var EventEmitter = require('events').EventEmitter,
+    util = require('util'),
     TLed,
     TButton,
     TNode;
@@ -6,7 +7,7 @@ var EventEmitter = require('events').EventEmitterm
 TLed = function TLed(ledAddr, _trellis) {
   var tled = {};
   tled.output = function output(value) {
-    _trellis.outputLed(ledAdr, value);
+    _trellis.outputLed(ledAddr, value);
   }
   return tled;
 };
