@@ -1,5 +1,5 @@
 var tessel = require('tessel'),     // This requires that tessel libraries be installed on developers machine
-    TNode = require('./TNode.js'),       // This 
+    TNode = require('./lib/TNode.js'),       // This 
     util = require('util'),
     EventEmitter= require('events').EventEmitter,
     Trellis;                        // The module function
@@ -8,14 +8,14 @@ var tessel = require('tessel'),     // This requires that tessel libraries be in
  * This function creates a new Trellis object
  */
 Trellis = function Trellis(port, interrupt_enable, interrupt_mode) {
-  var trellis = {}, // For public interface
+  var trellis = new EventEmitter(), // For public interface
       _trellis = {}; // For internal data
 
-  util.inherits(_trellis, EventEmitter);
 
   // Setup default options
   _trellis.port = port;
-  _trellis.dispBuf = new Buffer(16);
+  _trellis.dispBuf = new Buffer(17);
+  _trellis.dispBuf.fill(0);
   // The device i2c address
   _trellis.addr = 0x70;
   _trellis.i2c = new port.I2C(_trellis.addr);
@@ -29,13 +29,13 @@ Trellis = function Trellis(port, interrupt_enable, interrupt_mode) {
       if (!err) {
         _trellis.i2c.send(new Buffer([0x81]), function(err) { // Turn on display no blink  b'1000 0001'
           if (!err) {
-            callback(trellis);
+            setTimeout(function(){callback(trellis)}, 1000);
           } else {
-            _trellis.emit('error', err);
+            trellis.emit('err');
           }
         });
       } else {
-       _trellis.emit('error', err); 
+       trellis.emit('err'); 
       }
     });
 
@@ -50,14 +50,13 @@ Trellis = function Trellis(port, interrupt_enable, interrupt_mode) {
    * Build up the matrix of nodes
    */
   _trellis.nodes = [
-    [TNode(0x73, 0x07, _trellis), TNode(0x67, 0x04, _trellis), TNode(0x65, 0x02, _trellis), TNode(0x64, 0x22, _trellis)],
-    [TNode(0x51, 0x05, _trellis), TNode(0x52, 0x00, _trellis), TNode(0x43, 0x00, _trellis), TNode(0x44, 0x01, _trellis)],
-    [TNode(0x23, 0x03, _trellis), TNode(0x34, 0x10, _trellis), TNode(0x21, 0x30, _trellis), TNode(0x20, 0x21, _trellis)],
-    [TNode(0x17, 0x13, _trellis), TNode(0x16, 0x12, _trellis), TNode(0x15, 0x11, _trellis), TNode(0x02, 0x31, _trellis)]
+    [TNode(0x72, 0x07, _trellis), TNode(0x67, 0x04, _trellis), TNode(0x65, 0x02, _trellis), TNode(0x64, 0x22, _trellis)],
+    [TNode(0x50, 0x05, _trellis), TNode(0x51, 0x00, _trellis), TNode(0x43, 0x00, _trellis), TNode(0x44, 0x01, _trellis)],
+    [TNode(0x26, 0x03, _trellis), TNode(0x33, 0x10, _trellis), TNode(0x21, 0x30, _trellis), TNode(0x20, 0x21, _trellis)],
+    [TNode(0x16, 0x13, _trellis), TNode(0x15, 0x12, _trellis), TNode(0x14, 0x11, _trellis), TNode(0x02, 0x31, _trellis)]
   ];
  
   _trellis.buttonValue = function checkButton(buttonAddr) {
-    console.trace("Check");
     // Send read button data response
 //    _trellis.i2c.transfer(new Buffer([]), function (err, rx) {
       // Get back some buffer and go through the results, we REALLY need something better than callbacks
@@ -65,15 +64,17 @@ Trellis = function Trellis(port, interrupt_enable, interrupt_mode) {
   };
 
   _trellis.outputLed = function outputLed(ledAddr, value) {
-    var bufferOffset = (ledAddr >> 4) * 2;
-    var bytes = _trellis.dispBuf.readUInt16BE(bufferOffset);
-    if (value) {
-      bytes |= (1 << (0x0F & ledAddr));
-    } else {
-      bytes &= ~(1 << (0x0F & ledAddr));
+    var bufferOffset, // which byte in the offset to we need to change?
+        currentByte; // the current byte which we are working on 
+    bufferOffset = 1 + (ledAddr >> 4); // Use the top 4 bites of the address to index into the buffer
+    bytes = _trellis.dispBuf.readUInt8(bufferOffset); // Read 1 byte from that location in the buffer
+    if (value) { // LED should be on
+      bytes |= (1 << (0x0F & ledAddr)); // Use the bottom 4 bits of the address to choose 1 bit to toggle in the byte
+    } else { // LED should be off
+      bytes &= ~(1 << (0x0F & ledAddr)); // Use the buttom 4 bits of the address to choose 1 bite toggle in the byte
     }
-    _trellis.dispBuf.writeUInt16BE(bytes, bufferOffset);
-    _trellis.i2c.send(Buffer.concat([new Buffer([0x00]), (_trellis.dispBuf)], 17));
+    _trellis.dispBuf.writeUInt8(bytes, bufferOffset); // Write the byte back into the buffer
+    _trellis.i2c.send(_trellis.dispBuf); // Send the whole buffer, including the display pointer command as the first byte
   };
 
 
@@ -93,7 +94,6 @@ Trellis = function Trellis(port, interrupt_enable, interrupt_mode) {
   };
 
   trellis.node = function node(row, col) {
-    console.trace("In node");
     return _trellis.nodes[row][col];
   };
 
@@ -102,9 +102,6 @@ Trellis = function Trellis(port, interrupt_enable, interrupt_mode) {
     level = level % 16;
     i2c.send(new Buffer([0xE0 | level]));
   }; 
-
-
-  trellis.i2c = _trellis.i2c;
 
   return trellis;
 }

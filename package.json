@@ -4,7 +4,7 @@
   "description": "A library for the Tessel to work with Adafruit Trellis",
   "main": "index.js",
   "scripts": {
-    "test": "test"
+    "test": "node_modules/mocha/bin/mocha --recursive test"
   },
   "repository": {
     "type": "git",
@@ -22,5 +22,8 @@
   "bugs": {
     "url": "https://github.com/nmoadev/trellis-tessel/issues"
   },
-  "homepage": "https://github.com/nmoadev/trellis-tessel"
+  "homepage": "https://github.com/nmoadev/trellis-tessel",
+  "devDependencies": {
+    "mocha": "^2.2.4"
+  }
 }
