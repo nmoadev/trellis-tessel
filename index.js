@@ -98,9 +98,8 @@ Trellis = function Trellis(port, interrupt_enable, interrupt_mode) {
   };
 
   trellis.dim = function dim(level) {
-    level = level | 15;
-    level = level % 16;
-    i2c.send(new Buffer([0xE0 | level]));
+    level = level % 8;
+    _trellis.i2c.send(new Buffer([0xE0 | level]));
   }; 
 
   return trellis;
