@@ -55,14 +55,15 @@ Trellis = function Trellis(port, interrupt_enable) {
    * Read the key data and store it in the btn buffer. This is called whenever an interrupt is raised
    * NOTE: The key data was be read entirely in order for the inerrupt flag to be reset
    */
-  _trellis.readKeyData = function() {
+  _trellis.readKeyData = function(cause) {
     _trellis.i2c.transfer(new Buffer([Commands.READ_BTN]), 6, function(err, rx) { 
     if (err) {
       trellis.emit("error", err);
       return;
     }
     _trellis.btnBuf = rx;
-    trellis.emit('button');
+    trellis.emit('keydata');
+    trellis.emit(cause);
     });
   }; // end read key data
 
@@ -84,7 +85,7 @@ Trellis = function Trellis(port, interrupt_enable) {
     // If interrupts are NOT enabled, the key data must be read on demand.
     } else {
       // Setup a one-time event handler for grabbing the button value
-      _trellis.pub.once('button', function() {
+      _trellis.pub.once('keydata', function() {
         // Get 1 byte from the buffer and mask it, if the result equals the mask, the button is on
         if (_trellis.btnBuf[(addr >> 4)] & mask) {
           callback(1);
@@ -138,10 +139,13 @@ Trellis = function Trellis(port, interrupt_enable) {
           if (_trellis.interrupts) {
             _trellis.port.digital[0].input();
             // Initial read to ensure that interrupt is cleared
-            trellis.once('button', function() {
+            trellis.once('keydata', function() {
               _trellis.port.digital[0].on('rise', function() {
-                _trellis.readKeyData();
+                _trellis.readKeyData('press');
               }); // end on rise
+              _trellis.port.digital[0].on('fall', function() {
+                _trellis.readKeyData('release');
+              });
             }); // end button once
             _trellis.readKeyData();
             callback();
