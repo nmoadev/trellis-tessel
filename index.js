@@ -1,5 +1,15 @@
-var tessel = require('tessel'),     // This requires that tessel libraries be installed on developers machine
-    TNode = require('./lib/TNode.js'),       // This 
+// Copyright 2015 Alain Owen Kuchta See the COPYRIGHT
+// file at the top-level directory of this distribution.
+//
+// Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
+// http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
+// <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your
+// option. This file may not be copied, modified, or distributed
+// except according to those terms.
+
+
+
+var TNode = require('./lib/TNode.js'),       // This 
     util = require('util'),
     EventEmitter = require('events').EventEmitter,
     Commands,
@@ -168,6 +178,9 @@ Trellis = function Trellis(port, interrupt_enable) {
    * Grab a specific LED
    */
   trellis.led = function led(row, col) {
+    if (row + col > 6 || row + col < 0 ) {
+      throw new Error("Index Error: (" + row + "," + col + ") is not a valid index.");
+    }
     return _trellis.nodes[row][ col].led;
   };
 
@@ -175,6 +188,9 @@ Trellis = function Trellis(port, interrupt_enable) {
    * Grab a specific Button
    */
   trellis.button = function button(row, col) {
+    if (row + col > 6 || row + col < 0 ) {
+      throw new Error("Index Error: (" + row + "," + col + ") is not a valid index.");
+    }
     return _trellis.nodes[row][col].button;
   };
 
@@ -182,6 +198,9 @@ Trellis = function Trellis(port, interrupt_enable) {
    * Grab a node (button-led pair)
    */
   trellis.node = function node(row, col) {
+    if (row + col > 6 || row + col < 0 ) {
+      throw new Error("Index Error: (" + row + "," + col + ") is not a valid index.");
+    }
     return _trellis.nodes[row][col];
   };
 
@@ -190,7 +209,8 @@ Trellis = function Trellis(port, interrupt_enable) {
    * Levels: - 0 (dimmest) to 7 (brightest)
    */
   trellis.brightness = function brightness(level) {
-    level = level % 8;
+    level = level | 0;
+    level = level & 0x0F; // take only the lowest 4 bits
     _trellis.i2c.send(new Buffer([0xE0 | level]));
   }; 
 
@@ -202,7 +222,8 @@ Trellis = function Trellis(port, interrupt_enable) {
    * 3 - .5 Hz
    */
   trellis.blink = function blink(speed) {
-    speed = speed & 0x07;
+    speed = speed | 0;
+    speed = speed & 0x03; // take only the low two bits
     speed = speed << 1;
     _trellis.i2c.send(new Buffer([Commands.DISP_ON | speed]));
   };
