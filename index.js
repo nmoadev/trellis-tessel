@@ -30,6 +30,7 @@ Trellis = function Trellis(port, interrupt_enable) {
   //
 
   // Setup default options
+  trellis.setMaxListeners(20);
   _trellis.pub = trellis;
   _trellis.port = port;
   _trellis.dispBuf = new Buffer(17);
@@ -67,6 +68,12 @@ Trellis = function Trellis(port, interrupt_enable) {
     });
   }; // end read key data
 
+  _trellis.buttonValueCached = function buttonValueCached(addr) {
+    var mask;
+    mask = (1 << (addr & 0x0F)); // Use the lower half othe address as a mask to choose just one bit
+    return (_trellis.btnBuf[(addr >> 4)] & mask);
+  };
+
   /**
    *
    */
@@ -75,13 +82,7 @@ Trellis = function Trellis(port, interrupt_enable) {
     mask = (1 << (addr & 0x0F)); // Use the lower half othe address as a mask to choose just one bit
     // If interrupts are enabled, the key data was already read and stored in btnBuf
     if (_trellis.interrupts) {
-
-      if (_trellis.btnBuf[(addr >> 4)] & mask) {
-        callback(1);
-      } else {
-        callback(0);
-      }    
-    
+      callback(_trellis.btnBuf[(addr >> 4)] & mask);
     // If interrupts are NOT enabled, the key data must be read on demand.
     } else {
       // Setup a one-time event handler for grabbing the button value
@@ -203,7 +204,6 @@ Trellis = function Trellis(port, interrupt_enable) {
   trellis.blink = function blink(speed) {
     speed = speed & 0x07;
     speed = speed << 1;
-    console.log(new Buffer([Commands.DISP_ON | speed]));
     _trellis.i2c.send(new Buffer([Commands.DISP_ON | speed]));
   };
 
