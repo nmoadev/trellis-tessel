@@ -207,6 +207,16 @@ Trellis = function Trellis(port, interrupt_enable) {
     _trellis.i2c.send(new Buffer([Commands.DISP_ON | speed]));
   };
 
+  trellis.clearDisplay = function clearDisplay() {
+    _trellis.dispBuf.fill(0);
+    _trellis.i2c.send(_trellis.dispBuf);
+  };
+
+  trellis.fillDisplay = function fillDisplay() {
+    _trellis.dispBuf.fill(0xFF);
+    _trellis.i2c.send(_trellis.dispBuf);
+  };
+
   return trellis;
 };
 
