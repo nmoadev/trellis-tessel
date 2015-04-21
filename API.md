@@ -27,7 +27,7 @@ var tessel = require('tessel'),
 myTrellis = Trellis(tessel.port['B']);
 ```
 
-## Methods
+### Methods
 #### `trellis.ready(callback)`
 **IMPORTANT!** You must make sure that you call this function and that is has completed before trying to use any other parts of the API. This function makes sure the trellis device is correctly configured to receive commands.
 
