@@ -25,3 +25,5 @@ myTrellis.ready(function(err) {
 });
 ```
 
+## Full API
+The full is found under [API](API.md)
