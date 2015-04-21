@@ -49,6 +49,18 @@ get the TLed object at location `(i,j)`
 get the TButton object at location `(i,j)`
 #### `trellis.node[i][j]`
 get the TNode (a button, led combo) at location `(i,j)`
+### `trellis.fillDisplay()`
+Turn on every LED
+### `trellis.clearDisplay()`
+Turn off every LED
+### `trellis.brightness(level)`
+Sets the brightness of the panel. Levels are 0 (dimmest, but on) to 15 (brightest)
+### `trellis.blink(rate)`
+Sets the blink rate of the panel. Rates are
+* 0 (no blink)
+* 1 (2Hz blink)
+* 2 (1Hz blink)
+* 3 (.5Hz blink)
 
 ## TNode
 #### `tnode.button`
