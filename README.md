@@ -1,9 +1,9 @@
 # trellis-tessel
 A [Tessel](https://tessel.io/) module for [Adafruit Trellis](http://www.adafruit.com/product/1616).
-Designed for use with the Tessel 1, this module provides a simple interface to HT16K33 RAM Mapped LED driver that is the heart of the Adafruit Trellis system.
+Designed for use with the Tessel 1, this module provides a simple interface to the HT16K33 RAM Mapped LED driver that is the heart of the Adafruit Trellis system.
 
 ## Features
-* Straight-forward button/LED access with row-col coordinates.
+* Straight-forward button/LED access with row-column coordinates.
 * Button press and release events
 * Brightness and blink control
 
