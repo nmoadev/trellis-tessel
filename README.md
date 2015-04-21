@@ -17,11 +17,11 @@ To use the module
 var tessel = require('tessel'),
     Trellis = require('trellis-tessel'),
     myTrellis = Trellis(tessel.port['B'], false); // Create a new trellis object connected to portB with interrupts off
-    myTrellis.ready(function(err) {
-      if (!err) {
-        myTrellis.fillDisplay();// Turn on all LEDs
-        myTrellis.blink(1); // Blink @ 2Hz
-      }
-    });
+myTrellis.ready(function(err) {
+  if (!err) {
+    myTrellis.fillDisplay();// Turn on all LEDs
+    myTrellis.blink(1); // Blink @ 2Hz
+  }
+});
 ```
 
