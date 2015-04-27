@@ -234,7 +234,7 @@ Trellis = function Trellis(port, interrupt_enable) {
   };
 
   trellis.fillDisplay = function fillDisplay() {
-    _trellis.dispBuf.fill(0xFF);
+    _trellis.dispBuf.fill(0xFF, 1); // skip first byte because it is a command
     _trellis.i2c.send(_trellis.dispBuf);
   };
 

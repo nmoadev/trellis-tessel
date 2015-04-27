@@ -16,7 +16,6 @@ MockI2C = function(addr) {
     }
   };
   this.transfer = function(buf, sz, cb) {
-    console.log("send");
     cb(new Buffer(sz));
   };
   spies.send = sinon.spy(this, 'send');
